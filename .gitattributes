@@ -1,1 +1,1 @@
-  buildSrc/src/main/java linguist-vendored
+  buildSrc/src/main/java/* linguist-vendored
