@@ -1,7 +1,4 @@
-import kotlin.reflect.KClass
-
-@DslMarker
-annotation class TableBuilderDslMarker
+package dsl
 
 fun table(database: Database, initializer: SqlTableBuilder.() -> Unit) =
     SqlTableBuilder(database).apply(initializer).also {
@@ -16,88 +13,6 @@ fun table(database: Database, initializer: SqlTableBuilder.() -> Unit) =
         )
     }
 
-@TableBuilderDslMarker
-class SqlTableBuilder(private val database: Database) {
-
-    fun columns(initializer: ColumnBuilder.() -> Unit) {
-        ColumnBuilder(database).apply(initializer).build()
-    }
-
-    fun row(initializer: EntityBuilder.() -> Unit) {
-        EntityBuilder(database).apply(initializer)
-    }
-
-    fun build() = database
-
-}
-
-data class SqlTableColumn<T : Any>(val name: String, val clazz: KClass<T>)
-
-@TableBuilderDslMarker
-class ColumnBuilder(private val database: Database) {
-
-    private val columnInfo = mutableMapOf<String, SqlTableColumn<*>>()
-
-    fun column(name: String, clazz: KClass<*>) {
-        val availableDataTypes = database.getAvailableDataTypes()
-        if (clazz !in availableDataTypes) throw RuntimeException("Unsupported data type")
-        columnInfo[name] = SqlTableColumn(name, clazz)
-    }
-
-    fun build() = database.setTableInfo(columnInfo)
-
-}
-
-@TableBuilderDslMarker
-class EntityBuilder(val database: Database) {
-
-    inline fun <reified T : Any> cell(columnName: String, value: T) {
-        val type = database.getTableInfo()[columnName]?.clazz
-            ?: throw RuntimeException("No such column with name $columnName")
-        val columnDataType = (T::class)
-        if (type != columnDataType) {
-            throw RuntimeException("Incorrect data type. Received ${columnDataType.simpleName}." +
-                    " Should be ${type.simpleName}")
-        }
-        database.insertColumnData(columnName, value)
-    }
-}
-
-
-interface Database {
-    fun getAvailableDataTypes(): List<KClass<*>>
-    fun setTableInfo(columnInfo: Map<String, SqlTableColumn<*>>)
-    fun getTableInfo(): Map<String, SqlTableColumn<*>>
-    fun insertColumnData(string: String, obj: Any)
-    fun getColumnData(): Map<String, List<Any>>
-}
-
-class TestDatabaseImpl : Database {
-
-    private var tableInfo: Map<String, SqlTableColumn<*>> = mapOf()
-
-    private var entityInfo: MutableMap<String, MutableList<Any>> = mutableMapOf()
-
-    override fun getAvailableDataTypes(): List<KClass<*>> {
-        return listOf(Int::class, String::class, Float::class, Boolean::class)
-    }
-
-    override fun setTableInfo(columnInfo: Map<String, SqlTableColumn<*>>) {
-        tableInfo = columnInfo.toMap()
-    }
-
-    override fun getTableInfo(): Map<String, SqlTableColumn<*>> {
-        return tableInfo
-    }
-
-    override fun insertColumnData(string: String, obj: Any) {
-        entityInfo.getOrPut(string, ::mutableListOf).add(obj)
-    }
-
-    override fun getColumnData(): Map<String, List<Any>> {
-        return entityInfo
-    }
-}
 
 /*
  * Supported types are described in Database Implementation

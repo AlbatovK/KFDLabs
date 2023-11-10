@@ -1,4 +1,4 @@
-package multithreading
+package multithreading.concurrent
 
 sealed class Transaction(val clientId: Long) {
     class DepositTransaction(

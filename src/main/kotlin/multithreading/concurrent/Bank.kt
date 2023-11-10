@@ -1,8 +1,9 @@
-package multithreading
+package multithreading.concurrent
 
 import java.util.*
 import java.util.concurrent.*
 import kotlin.math.abs
+import multithreading.logging.Observer
 
 class Bank {
     fun startServing() {

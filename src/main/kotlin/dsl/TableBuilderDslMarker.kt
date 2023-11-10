@@ -1,3 +1,4 @@
 package dsl
 
-annotation class TableBuilderDslMarker()
+@DslMarker
+annotation class TableBuilderDslMarker

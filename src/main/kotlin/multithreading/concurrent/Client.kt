@@ -1,4 +1,4 @@
-package multithreading
+package multithreading.concurrent
 
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.locks.ReentrantLock

@@ -1,4 +1,5 @@
 package multithreading.logging
 
-class Observer {
+interface Observer {
+    fun update(message: String)
 }

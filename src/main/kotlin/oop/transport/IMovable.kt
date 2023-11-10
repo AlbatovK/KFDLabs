@@ -1,4 +1,7 @@
 package oop.transport
 
-class IMovable {
+interface IMovable {
+
+    fun move(distance: ULong)
+
 }

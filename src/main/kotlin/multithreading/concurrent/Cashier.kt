@@ -1,4 +1,4 @@
-package multithreading
+package multithreading.concurrent
 
 /**
  * To demonstrate concurrency transactions have different time of executing
