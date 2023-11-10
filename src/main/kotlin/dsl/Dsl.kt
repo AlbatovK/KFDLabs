@@ -13,7 +13,6 @@ fun table(database: Database, initializer: SqlTableBuilder.() -> Unit) =
         )
     }
 
-
 /*
  * Supported types are described in Database Implementation
  * Order of columns is not specific

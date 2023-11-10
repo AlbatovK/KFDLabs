@@ -1,9 +1,9 @@
 package multithreading.concurrent
 
+import multithreading.logging.Observer
 import java.util.*
 import java.util.concurrent.*
 import kotlin.math.abs
-import multithreading.logging.Observer
 
 @Suppress("MagicNumber")
 class Bank {

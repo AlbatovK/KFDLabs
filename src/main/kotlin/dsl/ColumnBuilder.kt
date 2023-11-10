@@ -17,5 +17,4 @@ class ColumnBuilder(private val database: Database) {
     }
 
     fun build() = database.setTableInfo(columnInfo)
-
 }

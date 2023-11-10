@@ -17,5 +17,4 @@ sealed class GroundTransport(engine: MechanicalEngine) : Transport(engine) {
     class Motorcycle(engine: InternalCombustionEngine) : GroundTransport(engine)
 
     class ElectricCar(engine: ElectricEngine) : GroundTransport(engine)
-
 }

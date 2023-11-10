@@ -37,7 +37,6 @@ fun main() {
     bank.startServing()
 }
 
-
 /** Example from main
  * log: Cashier 1 - withdraw | id=0: 100 -> 80 by 20
  * log: Cashier 2 - deposit | id=2: 200 -> 240 by 40

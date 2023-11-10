@@ -12,5 +12,4 @@ class CompressedAirEngine(
     override fun stop() = println(description() + " released gas")
 
     fun getGasPressure() = gasPressure
-
 }

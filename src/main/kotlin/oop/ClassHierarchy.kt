@@ -6,7 +6,6 @@ import oop.engine.InternalCombustionEngine
 import oop.transport.FlyingTransport
 import oop.transport.GroundTransport
 
-
 fun main() {
     val transportList = listOf("Motorcycle", "ElectricCar", "Jet", "AirPlane", "AirPlanner")
     println("Select transport type: ${transportList.joinToString(", ")}")
@@ -45,7 +44,3 @@ fun main() {
         println(transport.description())
     }
 }
-
-
-
-

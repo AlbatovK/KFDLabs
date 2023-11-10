@@ -20,5 +20,4 @@ sealed class FlyingTransport(engine: MechanicalEngine) : Transport(engine) {
     class AirPlane(engine: InternalCombustionEngine) : FlyingTransport(engine)
 
     class Jet(engine: ElectricEngine) : FlyingTransport(engine)
-
 }

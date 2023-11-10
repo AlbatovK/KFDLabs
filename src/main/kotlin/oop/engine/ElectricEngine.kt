@@ -12,5 +12,4 @@ class ElectricEngine(
     override fun stop() = println(description() + " stopped rotating")
 
     fun getRotationPerSecond() = rotPerSec
-
 }

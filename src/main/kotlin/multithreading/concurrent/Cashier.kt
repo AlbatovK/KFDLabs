@@ -1,6 +1,5 @@
 package multithreading.concurrent
 
-
 /**
  * To demonstrate concurrency transactions have different time of executing
  */
@@ -24,28 +23,28 @@ class Cashier(private val cashierId: Long, private val bank: Bank) : Thread() {
             when (transaction) {
                 is Transaction.WithdrawTransaction ->
                     "Cashier $cashierId - withdraw | id=${client.id}:" +
-                            " ${client.balance.get() + transaction.amount} -> ${client.balance} " +
-                            "by ${transaction.amount}"
+                        " ${client.balance.get() + transaction.amount} -> ${client.balance} " +
+                        "by ${transaction.amount}"
 
                 is Transaction.DepositTransaction ->
                     "Cashier $cashierId - deposit | id=${client.id}:" +
-                            " ${client.balance.get() - transaction.amount} -> ${client.balance} " +
-                            "by ${transaction.amount}"
+                        " ${client.balance.get() - transaction.amount} -> ${client.balance} " +
+                        "by ${transaction.amount}"
 
                 is Transaction.TransferTransaction -> {
                     receiverClient?.let {
                         "Cashier $cashierId - transfer | id=${client.id} -> id=${receiverClient.id}" +
-                                " by ${transaction.amount} in" +
-                                " ${client.currency} to ${receiverClient.currency}" +
-                                " balance ${receiverClient.balance}"
+                            " by ${transaction.amount} in" +
+                            " ${client.currency} to ${receiverClient.currency}" +
+                            " balance ${receiverClient.balance}"
                     } ?: "$cashierId ${client.id}: Invalid log data"
                 }
 
                 is Transaction.ExchangeCurrencyTransaction -> {
                     toCurrency?.let {
                         "Cashier $cashierId - exchange | id=${client.id}:" +
-                                " -> ${client.balance} " +
-                                "by ${client.currency} -> $toCurrency"
+                            " -> ${client.balance} " +
+                            "by ${client.currency} -> $toCurrency"
                     } ?: "$cashierId ${client.id}: Invalid log data"
                 }
             }

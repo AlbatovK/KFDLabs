@@ -19,5 +19,4 @@ class InternalCombustionEngine(
     override fun stop() = println(description() + " stopped fuel intake")
 
     fun getFuelType() = flammableFuelType
-
 }

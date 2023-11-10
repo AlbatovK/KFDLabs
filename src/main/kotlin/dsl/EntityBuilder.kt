@@ -9,8 +9,7 @@ class EntityBuilder(val database: Database) {
         val columnDataType = (T::class)
         if (type != columnDataType) {
             throw RuntimeException(
-                "Incorrect data type. Received ${columnDataType.simpleName}." +
-                        " Should be ${type.simpleName}"
+                "Incorrect data type. Received ${columnDataType.simpleName}. Should be ${type.simpleName}"
             )
         }
         database.insertColumnData(columnName, value)

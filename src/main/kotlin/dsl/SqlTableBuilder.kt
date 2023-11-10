@@ -12,5 +12,4 @@ class SqlTableBuilder(private val database: Database) {
     }
 
     fun build() = database
-
 }
