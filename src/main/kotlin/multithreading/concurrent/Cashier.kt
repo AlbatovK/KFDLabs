@@ -1,10 +1,58 @@
 package multithreading.concurrent
 
+
 /**
  * To demonstrate concurrency transactions have different time of executing
  */
+@Suppress("MagicNumber")
 class Cashier(private val cashierId: Long, private val bank: Bank) : Thread() {
 
+    private fun getExchangeValue(fromCurrency: String, toCurrency: String, amount: Long): Long {
+        val currencyDlt =
+            bank.exchangeRates.getOrDefault(fromCurrency, 1)
+                .toDouble() / bank.exchangeRates.getOrDefault(toCurrency, 1)
+        return (amount * currencyDlt).toLong()
+    }
+
+    private fun log(
+        client: Client,
+        receiverClient: Client? = null,
+        toCurrency: String? = null,
+        transaction: Transaction
+    ) {
+        bank.notifyObservers(
+            when (transaction) {
+                is Transaction.WithdrawTransaction ->
+                    "Cashier $cashierId - withdraw | id=${client.id}:" +
+                            " ${client.balance.get() + transaction.amount} -> ${client.balance} " +
+                            "by ${transaction.amount}"
+
+                is Transaction.DepositTransaction ->
+                    "Cashier $cashierId - deposit | id=${client.id}:" +
+                            " ${client.balance.get() - transaction.amount} -> ${client.balance} " +
+                            "by ${transaction.amount}"
+
+                is Transaction.TransferTransaction -> {
+                    receiverClient?.let {
+                        "Cashier $cashierId - transfer | id=${client.id} -> id=${receiverClient.id}" +
+                                " by ${transaction.amount} in" +
+                                " ${client.currency} to ${receiverClient.currency}" +
+                                " balance ${receiverClient.balance}"
+                    } ?: "$cashierId ${client.id}: Invalid log data"
+                }
+
+                is Transaction.ExchangeCurrencyTransaction -> {
+                    toCurrency?.let {
+                        "Cashier $cashierId - exchange | id=${client.id}:" +
+                                " -> ${client.balance} " +
+                                "by ${client.currency} -> $toCurrency"
+                    } ?: "$cashierId ${client.id}: Invalid log data"
+                }
+            }
+        )
+    }
+
+    @Suppress("TooGenericExceptionThrown")
     override fun run() {
         while (true) {
             /**
@@ -16,7 +64,7 @@ class Cashier(private val cashierId: Long, private val bank: Bank) : Thread() {
             val client = bank.clients[transaction.clientId]
             if (client == null) {
                 bank.notifyObservers("Cashier $cashierId - No such bank client found")
-                return
+                error("Client not authorized")
             }
 
             when (transaction) {
@@ -24,11 +72,7 @@ class Cashier(private val cashierId: Long, private val bank: Bank) : Thread() {
                     synchronized(client.lock) {
                         sleep(1000)
                         client.balance.addAndGet(transaction.amount)
-                        bank.notifyObservers(
-                            "Cashier $cashierId - deposit | id=${client.id}:" +
-                                    " ${client.balance.get() - transaction.amount} -> ${client.balance} " +
-                                    "by ${transaction.amount}"
-                        )
+                        log(client = client, transaction = transaction)
                     }
                 }
 
@@ -42,23 +86,18 @@ class Cashier(private val cashierId: Long, private val bank: Bank) : Thread() {
                     val receiverClient = bank.clients[transaction.receiverId]
                     if (receiverClient == null) {
                         bank.notifyObservers("Cashier $cashierId - No such bank client found")
-                        throw IllegalStateException("Client not authorized")
+                        error("Client not authorized")
                     }
                     synchronized(if (receiverClient.id > client.id) receiverClient.lock else client.lock) {
                         synchronized(if (receiverClient.id > client.id) client.lock else receiverClient.lock) {
                             sleep(3000)
-                            val clientCur = bank.exchangeRates.getOrDefault(client.currency, 1)
-                            val receiverCur = bank.exchangeRates.getOrDefault(receiverClient.currency, 1)
-                            val currencyDlt = clientCur.toDouble() / receiverCur
-                            val addAmount = (currencyDlt * transaction.amount).toLong()
+                            val addAmount = getExchangeValue(
+                                client.currency,
+                                receiverClient.currency, transaction.amount
+                            )
                             receiverClient.balance.addAndGet(addAmount)
                             client.balance.addAndGet(-transaction.amount)
-                            bank.notifyObservers(
-                                "Cashier $cashierId - transfer | id=${client.id} -> id=${receiverClient.id}" +
-                                        " by ${transaction.amount} in" +
-                                        " ${client.currency} to $addAmount in ${receiverClient.currency}" +
-                                        " balance ${receiverClient.balance}"
-                            )
+                            log(client = client, receiverClient = receiverClient, transaction = transaction)
                         }
                     }
                 }
@@ -67,11 +106,7 @@ class Cashier(private val cashierId: Long, private val bank: Bank) : Thread() {
                     synchronized(client.lock) {
                         sleep(1000)
                         client.balance.addAndGet(-transaction.amount)
-                        bank.notifyObservers(
-                            "Cashier $cashierId - withdraw | id=${client.id}:" +
-                                    " ${client.balance.get() + transaction.amount} -> ${client.balance} " +
-                                    "by ${transaction.amount}"
-                        )
+                        log(client = client, transaction = transaction)
                     }
                 }
 
@@ -79,17 +114,9 @@ class Cashier(private val cashierId: Long, private val bank: Bank) : Thread() {
                     with(transaction) {
                         synchronized(client.lock) {
                             sleep(2000)
-                            val currencyDlt =
-                                bank.exchangeRates.getOrDefault(client.currency, 1)
-                                    .toDouble() / bank.exchangeRates.getOrDefault(toCurrency, 1)
-                            val newAmount = (client.balance.get() * currencyDlt).toLong()
-                            val oldBalance = client.balance.get()
+                            val newAmount = getExchangeValue(client.currency, toCurrency, client.balance.get())
                             client.balance.set(newAmount)
-                            bank.notifyObservers(
-                                "Cashier $cashierId - exchange | id=${client.id}:" +
-                                        " $oldBalance -> ${client.balance} " +
-                                        "by ${client.currency} -> $toCurrency"
-                            )
+                            log(client = client, toCurrency = toCurrency, transaction = transaction)
                             client.currency = toCurrency
                         }
                     }

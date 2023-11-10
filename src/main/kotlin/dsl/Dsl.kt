@@ -19,6 +19,7 @@ fun table(database: Database, initializer: SqlTableBuilder.() -> Unit) =
  * Order of columns is not specific
  * Some basic data type checks are being performed
  */
+@Suppress("MagicNumber")
 fun main() {
     val dbImpl = TestDatabaseImpl()
     table(dbImpl) {

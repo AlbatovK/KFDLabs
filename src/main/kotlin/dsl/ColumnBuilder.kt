@@ -9,6 +9,7 @@ class ColumnBuilder(private val database: Database) {
 
     private val columnInfo = mutableMapOf<String, SqlTableColumn<*>>()
 
+    @Suppress("TooGenericExceptionThrown")
     fun column(name: String, clazz: KClass<*>) {
         val availableDataTypes = database.getAvailableDataTypes()
         if (clazz !in availableDataTypes) throw RuntimeException("Unsupported data type")

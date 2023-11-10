@@ -5,7 +5,7 @@ import multithreading.concurrent.Client
 import multithreading.concurrent.Transaction
 import multithreading.logging.Logger
 
-
+@Suppress("MagicNumber")
 fun main() {
     val bank = Bank()
     val clientA = Client(0, 100, "EUR")

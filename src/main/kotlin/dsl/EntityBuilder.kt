@@ -2,7 +2,7 @@ package dsl
 
 @TableBuilderDslMarker
 class EntityBuilder(val database: Database) {
-
+    @Suppress("TooGenericExceptionThrown")
     inline fun <reified T : Any> cell(columnName: String, value: T) {
         val type = database.getTableInfo()[columnName]?.clazz
             ?: throw RuntimeException("No such column with name $columnName")

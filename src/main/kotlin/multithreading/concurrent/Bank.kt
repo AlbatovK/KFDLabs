@@ -5,6 +5,7 @@ import java.util.concurrent.*
 import kotlin.math.abs
 import multithreading.logging.Observer
 
+@Suppress("MagicNumber")
 class Bank {
     fun startServing() {
         cashiers.forEach(Thread::start)
